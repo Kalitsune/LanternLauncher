@@ -1,6 +1,10 @@
 name: Build
 
-on: push
+#build on tag starting with lv
+on:
+  push:
+    tags:
+      - 'lv*'
 
 jobs:
   release:
