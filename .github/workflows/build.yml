@@ -64,8 +64,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "docs(): bumping release ${{ steps.semantic_release_info.outputs.git_tag }}"
-          git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+          git commit -m "docs(): bumping release ${{ startsWith(github.ref, 'refs/tags/v*-L') }}"
           
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
