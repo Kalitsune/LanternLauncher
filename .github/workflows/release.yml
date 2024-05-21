@@ -1,4 +1,4 @@
-name: Release
+name: Build
 
 #build on tag starting with lv
 on:
@@ -7,11 +7,49 @@ on:
       - 'v*-L'
 
 jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: release
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+
+      - name: Checkout the commit from release job
+        run: |
+          git fetch origin ${{ needs.update-version.outputs.commit_sha }} --depth=1
+          git checkout ${{ needs.update-version.outputs.commit_sha }}
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v*-L') }}
+    
   release:
     runs-on: ubuntu-latest
 
     env:
       GITHUB_TOKEN: ${{ github.token }}
+
+    outputs:
+      commit_sha: ${{ steps.update_version.outputs.commit_sha }}
 
     steps:
       - name: Checkout code
@@ -31,11 +69,13 @@ jobs:
           value: ${{ env.VERSION }}
       
       - name: Commit files
+        id: update_version
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
           git commit -m "🏷️ bumping release ${{ env.VERSION }}"
+          echo "::set-output name=commit_sha::$(git rev-parse HEAD)"
           
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
