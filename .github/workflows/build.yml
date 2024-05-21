@@ -1,0 +1,49 @@
+name: Build
+
+#build on tag starting with lv
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: check
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v*-L') }}
+    
+    check: # cancel the build if the commit message doesn't start with 🏷️ bumping release:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Check commit message
+          run: |
+            if [[ ! "$(git log --format=%B -n 1)" =~ ^🏷️\ bumping\ release.*$ ]]; then
+              echo "Commit message does not start with 🏷️ bumping release:"
+              echo "$(git log --format=%B -n 1)"
+              exit 1
+            fi
