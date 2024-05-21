@@ -38,7 +38,6 @@ jobs:
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
           release: true
-          releaseType: release
     
   release:
     runs-on: ubuntu-latest
