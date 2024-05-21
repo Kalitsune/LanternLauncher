@@ -30,7 +30,7 @@ jobs:
         with:
           file: package.json
           field: version
-          value: ${VERSION}
+          value: ${{ env.VERSION }}
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
@@ -69,21 +69,20 @@ jobs:
         with:
           file: package.json
           field: version
-          value: ${VERSION}
+          value: ${{ env.VERSION }}
       
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "docs(): bumping release ${VERSION}"
+          git commit -m "docs(): bumping release ${{ env.VERSION }}"
           
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ github.token }}
-          tags: true
-    
+
       - name: Github Automatic Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
