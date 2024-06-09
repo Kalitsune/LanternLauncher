@@ -42,7 +42,6 @@ linux:
     - target: 'AppImage'
     - target: 'deb'
     - target: 'rpm'
-    - target: 'pacman'
   maintainer: 'Kalitsune'
   vendor: 'Kalitsune'
   synopsis: 'Modded Minecraft Launcher'
