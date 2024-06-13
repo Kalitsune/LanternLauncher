@@ -38,6 +38,7 @@ const launch_progress         = document.getElementById('launch_progress')
 const launch_progress_label   = document.getElementById('launch_progress_label')
 const launch_details_text     = document.getElementById('launch_details_text')
 const server_selection_button = document.getElementById('server_selection_button')
+const image_seal              = document.getElementById('image_seal')
 const user_text               = document.getElementById('user_text')
 
 const loggerLanding = LoggerUtil.getLogger('Landing')
@@ -156,6 +157,7 @@ function updateSelectedServer(serv){
     ConfigManager.setSelectedServer(serv != null ? serv.rawServer.id : null)
     ConfigManager.save()
     server_selection_button.innerHTML = '&#8226; ' + (serv != null ? serv.rawServer.name : Lang.queryJS('landing.noSelection'))
+    image_seal.src = serv != null ? serv.rawServer.icon : "assets/images/icon.gif"
     if(getCurrentView() === VIEWS.settings){
         animateSettingsTabRefresh()
     }
